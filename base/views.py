@@ -6,6 +6,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import User, Profile, GeneratedImage, EnhancedImage, ColorizedImage
 from .forms import RegistrationForm, ProfileForm
 from ml_models.generation.inference import generate_image
+from ml_models.enhancement.inference import enhance_image
+from ml_models.colorization.inference import colorize_image
 
 def registerUser(request):
     if request.user.is_authenticated:
@@ -151,26 +153,27 @@ def imageEnhancement(request):
         if not request.user.is_authenticated:
             messages.error(request, 'User profile does not exist!')
             return redirect('login')
-        
+
         if 'image' not in request.FILES:
             messages.error(request, 'No image file provided!')
             return redirect('image-enhancement')
 
         image = request.FILES['image']
         profile = Profile.objects.get(user=request.user)
-
         if not profile:
             messages.error(request, 'User profile does not exist!')
-            redirect('login')
+            return redirect('login')
 
-        # Save the uploaded image
-        EnhancedImage.objects.create(profile=profile, image=image)
+        # Process the image using enhancement model
+        enhanced_image_path = enhance_image(image)  # Call enhancement function
+
+        # Save enhanced image in DB
+        enhanced_image = EnhancedImage.objects.create(profile=profile, image=enhanced_image_path)
         messages.success(request, 'Image enhanced successfully!')
         latest_image = EnhancedImage.objects.filter(profile=profile).latest('created_at')
 
         return redirect('output-image', image_id=latest_image.id)
-
-
+            
     return render(request, 'base/image_enhancement.html')
 @login_required(login_url='login')
 def delete_enhanced_image(request, image_id):
@@ -191,25 +194,27 @@ def imageColorization(request):
         if not request.user.is_authenticated:
             messages.error(request, 'User profile does not exist!')
             return redirect('login')
-        
+
         if 'image' not in request.FILES:
             messages.error(request, 'No image file provided!')
             return redirect('image-colorization')
 
         image = request.FILES['image']
         profile = Profile.objects.get(user=request.user)
-
         if not profile:
             messages.error(request, 'User profile does not exist!')
-            redirect('login')
-        
-        # Save the uploaded image
-        ColorizedImage.objects.create(profile=profile, image=image)
+            return redirect('login')
+
+        # Process the image using colorization model
+        colorized_image_path = colorize_image(image)  # Call colorization function
+
+        # Save colorized image in DB
+        colorized_image = ColorizedImage.objects.create(profile=profile, image=colorized_image_path)
         messages.success(request, 'Image colorized successfully!')
         latest_image = ColorizedImage.objects.filter(profile=profile).latest('created_at')
 
         return redirect('output-image', image_id=latest_image.id)
-
+            
     return render(request, 'base/image_colorization.html')
 @login_required(login_url='login')
 def delete_colorized_image(request, image_id):
