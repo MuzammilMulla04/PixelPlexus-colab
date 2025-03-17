@@ -1,26 +1,28 @@
-import os
-from diffusers import StableDiffusionPipeline
 import torch
+from diffusers import StableDiffusionPipeline
+import os
+from django.conf import settings
 
-# Load the model
-pipe = StableDiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5").to("cuda")  # Use GPU if available
+# Load Stable Diffusion model
+MODEL_PATH = os.path.join(settings.BASE_DIR, "models/pretrained/stable-diffusion")
 
-# Define the base directory for saving images
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # Gets PixelPlexus root
-SAVE_DIR = os.path.join(BASE_DIR, "media", "generated_images")
+device = "cuda" if torch.cuda.is_available() else "cpu"
 
-# Ensure the directory exists
-os.makedirs(SAVE_DIR, exist_ok=True)
+pipe = StableDiffusionPipeline.from_pretrained(MODEL_PATH, torch_dtype=torch.float16 if device == "cuda" else torch.float32)
+pipe.to(device)
 
-# Define function for text-to-image generation
-def generate_image(prompt, filename="generated.png"):
-    """Generates an image and saves it to the media folder."""
-    image = pipe(prompt).images[0]  # Generate image
-    save_path = os.path.join(SAVE_DIR, filename)  # Construct full path
-    image.save(save_path)  # Save output
-    return save_path
+def generate_image(prompt):
+    """
+    Generates an image from the given text prompt using Stable Diffusion.
+    """
+    with torch.no_grad():
+        image = pipe(prompt).images[0]
 
-# Example usage
-prompt = "A futuristic cyberpunk cityscape at night"
-generated_path = generate_image(prompt, "cyberpunk.png")
-print(f"Image saved at: {generated_path}")
+    # Save the generated image
+    output_path = os.path.join(settings.MEDIA_ROOT, "generated_images")
+    os.makedirs(output_path, exist_ok=True)
+    
+    image_path = os.path.join(output_path, f"{hash(prompt)}.png")
+    image.save(image_path)
+
+    return os.path.relpath(image_path, settings.MEDIA_ROOT)  # Return relative path for Django

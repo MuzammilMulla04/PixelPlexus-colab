@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import User, Profile, GeneratedImage, EnhancedImage, ColorizedImage
 from .forms import RegistrationForm, ProfileForm
-
+from ml_models.generation.inference import generate_image
 
 def registerUser(request):
     if request.user.is_authenticated:
@@ -110,20 +110,22 @@ def imageGeneration(request):
         if not request.user.is_authenticated:
             messages.error(request, 'User profile does not exist!')
             return redirect('login')
-        
-        if 'image' not in request.FILES:
-            messages.error(request, 'No image file provided!')
+
+        prompt= request.POST.get("prompt", "")
+        if not prompt:
+            messages.error(request, 'Prompt cannot be empty!')
             return redirect('image-generation')
 
-        image = request.FILES['image']
+        # image = request.FILES['image']
         profile = Profile.objects.get(user= request.user)
-
         if not profile:
             messages.error(request, 'User profile does not exist!')
             redirect('login')
 
-        # Save the uploaded image
-        GeneratedImage.objects.create(profile=profile, image=image)
+        image_path = generate_image(prompt)
+
+        # Save generated image in DB
+        generated_image = GeneratedImage.objects.create(profile=profile, image=image_path)
         messages.success(request, 'Image generated successfully!')
         latest_image = GeneratedImage.objects.filter(profile=profile).latest('created_at')
 
