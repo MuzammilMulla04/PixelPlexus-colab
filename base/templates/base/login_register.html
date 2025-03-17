@@ -1,0 +1,85 @@
+{% extends 'main.html' %}
+
+
+{% block content %}
+
+<main class="flex flex-col items-center justify-center min-h-screen ml-16 bg-neutral-900">
+    {% if page == 'login' %}
+    <div class="mb-6 text-center text-white">
+        <h3 class="text-2xl font-semibold">Login</h3>
+        <h2 class="text-lg text-neutral-300">Welcome Back</h2>
+    </div>
+
+    <form class="w-full max-w-sm p-6 shadow-md bg-neutral-800 rounded-xl" action="" method="POST">
+        {% csrf_token %}
+        <div class="mb-4">
+            <label for="username" class="block text-sm font-medium text-neutral-300">Username</label>
+            <input id="username" name="username" type="text" placeholder="e.g. username@123" required
+                class="block w-full p-2 mt-1 text-white transform scale-100 border rounded-md placeholder-neutral-400 border-neutral-300 bg-neutral-700 focus:outline-none focus:ring focus:ring-neutral-300 focus:transition-transform focus:scale-105" />
+        </div>
+        <div class="mb-8">
+            <label for="password" class="block text-sm font-medium text-neutral-300">Password</label>
+            <input id="password" name="password" type="password" placeholder="*********" required
+                class="block w-full p-2 mt-1 text-white transform scale-100 border rounded-md placeholder-neutral-400 border-neutral-300 bg-neutral-700 focus:outline-none focus:ring focus:ring-neutral-300 focus:transition-transform focus:scale-105" />
+        </div>
+
+        <button
+            class="flex flex-row justify-center w-full py-2 text-white transform scale-100 bg-purple-700 rounded-md hover:bg-purple-500 hover:text-black hover:transition-transform hover:scale-105"
+            type="submit">
+            Login
+            <svg xmlns="http://www.w3.org/2000/svg" height="26px" viewBox="0 -960 960 960" width="26px" fill="currentColor">
+                <path
+                    d="M520-120q-17 0-28.5-11.5T480-160q0-17 11.5-28.5T520-200h240v-560H520q-17 0-28.5-11.5T480-800q0-17 11.5-28.5T520-840h240q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H520Zm-73-320H160q-17 0-28.5-11.5T120-480q0-17 11.5-28.5T160-520h287l-75-75q-11-11-11-27t11-28q11-12 28-12.5t29 11.5l143 143q12 12 12 28t-12 28L429-309q-12 12-28.5 11.5T372-310q-11-12-10.5-28.5T373-366l74-74Z" />
+            </svg>
+        </button>
+    </form>
+
+    <div class="mt-4 text-center">
+        <p class="py-4 text-sm text-neutral-200">Haven't signed up yet?</p>
+
+        <div class="mt-4 duration-200 transform scale-100 hover:scale-105 hover:transition">
+            <a class="px-8 py-4 text-white bg-neutral-500 rounded-xl hover:bg-neutral-300 hover:text-black"
+                href="{% url 'register' %}">Sign Up</a>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="mb-6 text-center text-white">
+        <h3 class="text-2xl font-semibold">Register</h3>
+        <h2 class="text-lg text-neutral-300">Create an Account</h2>
+    </div>
+
+    <form class="w-full max-w-sm p-6 shadow-md bg-neutral-700 rounded-xl" action="" method="POST">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="mb-4">
+            <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-neutral-300">
+                {{ field.label }}
+            </label>
+            {{ field }}
+        </div>
+        {% endfor %}
+
+        <button
+            class="flex flex-row justify-center w-full py-2 mt-4 text-white duration-100 transform scale-100 bg-purple-700 rounded-md hover:bg-purple-500 hover:text-black hover:transition-transform hover:scale-105"
+            type="submit">
+            Register
+            <svg xmlns="http://www.w3.org/2000/svg" height="26px" viewBox="0 -960 960 960" width="26px" fill="currentColor">
+                <path
+                    d="M520-120q-17 0-28.5-11.5T480-160q0-17 11.5-28.5T520-200h240v-560H520q-17 0-28.5-11.5T480-800q0-17 11.5-28.5T520-840h240q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H520Zm-73-320H160q-17 0-28.5-11.5T120-480q0-17 11.5-28.5T160-520h287l-75-75q-11-11-11-27t11-28q11-12 28-12.5t29 11.5l143 143q12 12 12 28t-12 28L429-309q-12 12-28.5 11.5T372-310q-11-12-10.5-28.5T373-366l74-74Z" />
+            </svg>
+        </button>
+    </form>
+
+    <div class="mt-4 text-center">
+        <p class="text-sm text-neutral-200">Already Signed Up?</p>
+        <div class="mt-8 duration-200 transform scale-100 hover:scale-105 hover:transition">
+            <a class="px-8 py-4 text-white bg-neutral-500 rounded-xl hover:bg-neutral-300 hover:text-black"
+                href="{% url 'login' %}">Login</a>
+        </div>
+    </div>
+    {% endif %}
+</main>
+
+{% endblock content %}

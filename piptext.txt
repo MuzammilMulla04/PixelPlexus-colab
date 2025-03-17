@@ -1,0 +1,1 @@
+pip install django django-tailwind numpy pandas matplotlib django-browser-reload

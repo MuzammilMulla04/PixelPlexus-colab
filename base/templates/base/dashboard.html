@@ -1,0 +1,71 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<main class="min-h-screen p-6 ml-16 bg-neutral-900">
+    {% comment %} Filtered Search Bar {% endcomment %}
+    <div
+        class="container grid items-center gap-6 px-6 py-4 mb-6 rounded-lg shadow-lg sm:grid-cols-1 md:grid-cols-2 bg-neutral-800">
+        <div class="flex flex-row items-center">
+            <h2 class="text-3xl font-semibold text-white">Search Content</h2>
+        </div>
+
+        {% comment %} Search Bar {% endcomment %}
+        <div
+            class="flex items-center transition duration-300 transform scale-95 rounded-lg shadow-lg bg-neutral-700 h-14 hover:shadow-md focus-within:ring-2 ring-gray-400 focus-within:transition-transform focus-within:scale-100">
+            <button
+                class="flex items-center justify-center w-20 h-full text-gray-400 transition-transform duration-100 transform rounded-lg bg-neutral-600 hover:bg-neutral-300 hover:text-black hover:scale-110">
+                {% comment %} Filter Icon {% endcomment %}
+                <span class="font-semibold">Filter</span>
+            </button>
+            <input type="text" id="q" placeholder="Search..."
+                class="w-full h-full px-4 text-white placeholder-gray-400 bg-transparent border-0 focus:outline-none focus:ring-0" />
+            <button
+                class="flex items-center justify-center h-full text-gray-400 transition-transform duration-100 transform rounded-lg w-14 bg-neutral-700 hover:bg-neutral-300 hover:text-black hover:scale-110">
+                {% comment %} Search Icon {% endcomment %}
+                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" fill="currentColor">
+                    <path
+                        d="M380-320q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l224 224q11 11 11 28t-11 28q-11 11-28 11t-28-11L532-372q-30 24-69 38t-83 14Zm0-80q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+
+    {% comment %} Bio Content {% endcomment %}
+    <section
+        class="container bg-neutral-800 hover:bg-neutral-700 p-6 mb-6 rounded-lg shadow-lg hover:shadow-md transition-transform transform hover:scale-[1.01] duration-300">
+        <h2 class="mb-2 text-lg font-semibold text-white">Bio</h2>
+        <p class="text-gray-400">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ipsam praesentium illo, sed
+            magnam sunt cum, et, ad nemo enim velit accusantium veniam delectus nulla dolores sint non animi alias
+            fugiat?</p>
+    </section>
+
+    {% comment %} Widgets Section {% endcomment %}
+    <section class="container grid gap-6 mb-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        <div
+            class="bg-neutral-800 p-6 rounded-lg shadow-lg hover:bg-neutral-700 transition-all duration-300 transform hover:scale-[1.02]">
+            <h2 class="mb-2 text-lg font-semibold text-white">Views</h2>
+            <p class="text-gray-400">0</p>
+        </div>
+        <div
+            class="bg-neutral-800 p-6 rounded-lg shadow-lg hover:bg-neutral-700 transition-all duration-300 transform hover:scale-[1.02]">
+            <h2 class="mb-2 text-lg font-semibold text-white">Overall Rank</h2>
+            <p class="text-gray-400">0</p>
+        </div>
+        <div
+            class="bg-neutral-800 p-6 rounded-lg shadow-lg hover:bg-neutral-700 transition-all duration-300 transform hover:scale-[1.02]">
+            <h2 class="mb-2 text-lg font-semibold text-white">30-Day Rank</h2>
+            <p class="text-gray-400">0</p>
+        </div>
+    </section>
+
+    {% comment %} Additional Content {% endcomment %}
+    <section
+        class="container bg-neutral-800 hover:bg-neutral-700 p-6 rounded-lg shadow-lg hover:shadow-md transition-transform transform hover:scale-[1.01] duration-300">
+        <h2 class="mb-2 text-lg font-semibold text-white">Additional Content</h2>
+        <p class="text-gray-400">More detailed information can go here...</p>
+    </section>
+</main>
+
+{% endblock content %}

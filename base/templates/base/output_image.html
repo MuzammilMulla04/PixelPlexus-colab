@@ -1,0 +1,91 @@
+{% extends 'main.html' %} {% load static %} {% block content %}
+
+<main class="min-h-screen p-6 ml-16 bg-neutral-900">
+	{% comment %} Title: Image Generator {% endcomment %}
+	<div class="flex justify-center mb-8">
+		<div
+			class="[@media(max-width:400px)]:text-2xl [@media(max-width:500px)]:text-3xl text-5xl font-extrabold tracking-wide text-center text-white">
+			{{ image_type }} Image
+		</div>
+	</div>
+
+	{% comment %} Display Generated Image {% endcomment %}
+	<div
+		id="generatedImageContainer"
+		class="flex justify-center mt-6 mb-10 h-3/5">
+		<img
+			src="{{ image.image_url }}"
+			alt="Generated Image"
+			class="max-h-96" />
+	</div>
+	
+	{% comment %} Wrapper for Buttons {% endcomment %}
+	<div
+		class="grid gap-4 mt-6 grid-cols-1 [@media(min-width:550px)]:grid-cols-3 w-full max-w-lg mx-auto align-center">
+		{% comment %} Again Button (Go Back) {% endcomment %}
+		{% if image_type == 'Generated' %}
+		<a
+			href="{% url 'image-generation' %}"
+			class="px-6 py-2 text-lg font-semibold text-center text-white transition-all duration-300 bg-purple-700 rounded-lg shadow-md text-wrap hover:bg-purple-500 hover:scale-105">
+			Generate again
+		</a>
+		{% elif image_type == 'Enhanced' %}
+		<a
+			href="{% url 'image-enhancement' %}"
+			class="px-6 py-2 text-lg font-semibold text-center text-white transition-all duration-300 bg-purple-700 rounded-lg shadow-md text-wrap hover:bg-purple-500 hover:scale-105">
+			Enhance again
+		</a>
+		{% elif image_type == 'Colorized' %}
+		<a
+			href="{% url 'image-colorization' %}"
+			class="px-6 py-2 text-lg font-semibold text-center text-white transition-all duration-300 bg-purple-700 rounded-lg shadow-md text-wrap hover:bg-purple-500 hover:scale-105">
+			Colorize again
+		</a>
+		{% endif %}
+
+		{% comment %} Download Button {% endcomment %}
+		<a
+			href="{{ image.image_url }}"
+			download="generated_image"
+			class="px-6 py-2 text-lg font-semibold text-center text-white transition-all duration-300 rounded-lg shadow-md bg-neutral-600 text-wrap hover:bg-neutral-400 hover:scale-105">
+			Download Image
+		</a>
+
+		{% comment %} Share Button {% endcomment %}
+		<button
+			id="shareButton"
+			class="px-6 py-2 text-lg font-semibold text-center text-white transition-all duration-300 bg-green-700 rounded-lg shadow-md hover:bg-green-500 text-wrap hover:scale-105">
+			Share Image
+		</button>
+	</div>
+</main>
+
+<script>
+	document
+		.getElementById("shareButton")
+		.addEventListener("click", function () {
+			const imageUrl = "{{ image.image_url }}"; // Image URL to share
+
+			if (navigator.share) {
+				// Check if Web Share API is supported
+				navigator
+					.share({
+						title: "Check out this {{ image_type }} Image!",
+						text: "Here is a cool image I {{ image_type }} using PixelPlexus!",
+						url: imageUrl, // Share the image URL
+					})
+					.then(() => console.log("Image shared successfully!"))
+					.catch((error) =>
+						console.error("Error sharing the image:", error)
+					);
+			} else {
+				// Fallback for browsers that do not support Web Share API (optional)
+				alert(
+					"Web Share API is not supported on your browser. You can manually copy and share the image URL: " +
+						imageUrl
+				);
+			}
+		});
+</script>
+
+{% endblock content %}

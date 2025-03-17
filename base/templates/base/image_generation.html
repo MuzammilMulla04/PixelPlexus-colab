@@ -1,0 +1,145 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% block content %}
+
+<main class="min-h-screen p-6 ml-16 bg-neutral-900">
+    {% comment %} Title: Image Generator {% endcomment %}
+    <div class="mb-8 text-5xl font-extrabold tracking-wide text-center text-white">
+        Image Generator
+    </div>
+
+    <form action="{% url 'image-generation' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% comment %} Wrapper to center the upload container {% endcomment %}
+        <div class="flex items-center justify-center">
+            {% comment %} Drag & Drop Area {% endcomment %}
+            <div id="upload-container"
+                class="text-white w-full max-w-xl flex flex-col items-center justify-center min-h-[300px] m-4 p-6 border-2 border-dashed border-gray-400 rounded-xl text-center text-2xl transition-all duration-400 ease-in-out hover:border-blue-400 hover:bg-blue-100/20 hover:shadow-lg hover:scale-105">
+
+                <a id="select-files" class="cursor-pointer">
+                    <img src="{% static 'images/upload_icon.png' %}" alt="Select Image"
+                        class="w-24 h-auto mx-auto my-5 rounded-lg">
+                </a>
+
+                <p>Drag & Drop or <a id="select-files2" class="text-blue-400 cursor-pointer">Select Image</a></p>
+                <p class="text-lg text-gray-400 info">No image uploaded</p>
+            </div>
+
+            <input type="file" name="image" id="file-input" accept="image/*" class="hidden">
+        </div>
+
+        {% comment %} Wrapper for Input from User for Generator Prompt {% endcomment %}
+        <div class="flex flex-col items-center justify-center">
+            <textarea
+                class="block w-4/5 p-4 mt-8 text-lg text-white placeholder-gray-400 border-2 rounded-lg bg-neutral-800 focus:outline-none focus:border-blue-400"
+                placeholder="Enter a prompt for image generation" rows="4"></textarea>
+        </div>
+
+        {% comment %} Wrapper for Generate & Clear Buttons {% endcomment %}
+        <div class="flex justify-center gap-6 mt-6">
+            {% comment %} Generate Button {% endcomment %}
+            <button id="generateButton" type="submit"
+                class="px-8 py-3 text-lg font-semibold text-white transition-all duration-300 bg-purple-700 rounded-lg shadow-md w-fit hover:bg-purple-500 hover:scale-105">
+                Generate Image
+            </button>
+
+            {% comment %} Clear Image Button (initially hidden) {% endcomment %}
+            <button id="clearButton" style="display:none;" name="clear"
+                class="px-8 py-3 text-lg font-semibold text-white transition-all duration-300 rounded-lg shadow-md bg-neutral-600 w-fit hover:bg-neutral-400 hover:scale-105">
+                Clear Image
+            </button>
+        </div>
+    </form>
+
+    {% comment %} Display Generated Image {% endcomment %}
+    <div id="generatedImageContainer" class="flex justify-center mt-6 mb-10 h-3/5">
+        {% comment %} Generated image will be displayed here {% endcomment %}
+    </div>
+
+    <script>
+        function initializeEventListener() {
+            const uploadContainer = document.getElementById('upload-container');
+            const fileInput = document.getElementById('file-input');
+            const selectFiles = [document.getElementById('select-files'), document.getElementById('select-files2')];
+            const info = document.querySelector('.info');
+
+            // Set up click events to trigger the file input
+            selectFiles.forEach(element => {
+                element.addEventListener('click', () => fileInput.click());
+            });
+
+            // Drag over styling
+            uploadContainer.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadContainer.classList.add('dragover-animation');
+            });
+            uploadContainer.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                uploadContainer.classList.remove('dragover-animation');
+            });
+
+            // Handle drop event
+            uploadContainer.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadContainer.classList.remove('dragover-animation');
+                const file = e.dataTransfer.files[0];
+                fileInput.files = e.dataTransfer.files;
+                handleFile(file);
+            });
+
+            // Handle file input change
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                fileInput.files = e.target.files[0];
+                handleFile(file);
+            });
+
+            function handleFile(file) {
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = (e) => {
+                        uploadContainer.innerHTML = `
+                            <img src="${e.target.result}" class="uploadedImg">
+                            <p class="info"><span class="infoHeader">File Name: </span> ${file.name}</p>
+                            <p class="info"><span class="infoHeader">File Size: </span> ${(file.size / 1024).toFixed(2)} KB</p>
+                        `;
+                        // Show the Clear Image button after a valid image is loaded
+                        document.getElementById('clearButton').style.display = 'inline-block';
+                    };
+                } else {
+                    info.textContent = 'Please upload a valid image file.';
+                }
+            }
+        }
+
+        // Function to reset the upload container to its original state
+        function resetUploadContainer() {
+            const uploadContainer = document.getElementById('upload-container');
+            uploadContainer.innerHTML = `
+                <a id="select-files" class="cursor-pointer">
+                    <img src="{% static 'images/upload_icon.png' %}" alt="Select Image" class="w-24 h-auto mx-auto my-5 rounded-lg">
+                </a>
+                <p>Drag & Drop or <a id="select-files2" class="text-blue-400 cursor-pointer">Select Image</a></p>
+                <p class="text-lg text-gray-400 info">No image uploaded</p>
+            `;
+            // Hide the Clear Image button again
+            document.getElementById('clearButton').style.display = 'none';
+            // Reinitialize event listeners for the new elements
+            initializeEventListener();
+        }
+
+        // Initialize the event listeners on page load
+        initializeEventListener();
+
+        // Attach the reset functionality to the Clear Image button
+        document.getElementById('clearButton').addEventListener('click', function (event) {
+            event.preventDefault();  // Prevents form submission
+            resetUploadContainer();
+        });
+    </script>
+</main>
+
+{% endblock content %}

@@ -1,0 +1,36 @@
+{% extends 'main.html' %} {% block content %}
+
+<main
+	class="flex flex-col items-center justify-center min-h-screen ml-16 text-center bg-neutral-900">
+	<div class="max-w-2xl">
+		<h1 class="mb-4 text-5xl font-extrabold text-gray-200">PixelPlexus</h1>
+		<p class="mb-6 text-lg text-gray-200">
+			PixelPlexus understands significantly more nuance and detail than
+			our previous systems, allowing you to easily translate your ideas
+			into exceptionally accurate images.
+		</p>
+
+		<div>
+			<a
+				href="{% url 'login' %}"
+				class="inline-block px-6 py-3 text-white transition-transform duration-200 transform scale-100 bg-purple-700 rounded-md hover:bg-purple-500 hover:text-black hover:scale-110">
+				Try PixelPlexus
+				<svg
+					class="inline-block ml-2"
+					width="0.625rem"
+					viewBox="0 0 10 10"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg">
+					<path
+						d="M1 9L9 1M9 1H2.5M9 1V7.22222"
+						stroke="currentColor"
+						stroke-width="1.25"
+						stroke-linecap="round"
+						stroke-linejoin="round"></path>
+				</svg>
+			</a>
+		</div>
+	</div>
+</main>
+
+{% endblock content %}
