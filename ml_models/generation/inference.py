@@ -4,7 +4,7 @@ import os
 from django.conf import settings
 
 # Load Stable Diffusion model
-MODEL_PATH = os.path.join(settings.BASE_DIR, "models/pretrained/stable-diffusion")
+MODEL_PATH = os.path.join(settings.BASE_DIR, "ml_models/generation/sd_model")
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
