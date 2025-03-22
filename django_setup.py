@@ -44,7 +44,7 @@ def setup_django():
     run_command("python manage.py tailwind start")
 
     print("🔹 Setting up Ngrok for public access...")
-    NGROK_AUTH_TOKEN = "your-ngrok-auth-token"  # Replace with your actual Ngrok token
+    NGROK_AUTH_TOKEN = "2uGWoKaslH2DMr0GRpkuLtXvtsP_5JGPVTYxJvuFznF25kKsS"  # Replace with your actual Ngrok token
     run_command(f"ngrok authtoken {NGROK_AUTH_TOKEN}")
 
     PORT = 8000
