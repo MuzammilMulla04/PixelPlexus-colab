@@ -24,7 +24,7 @@ def enhance_image(image_path, user_prompt= None):
         
         with torch.inference_mode():
             upscaled_image = pipe(
-                prompt="high quality, detailed, realistic" if not user_prompt else user_prompt,
+                prompt="high quality, detailed, realistic" if user_prompt is None else user_prompt,
                 image=input_image,
                 num_inference_steps=50,
                 guidance_scale=7.5
