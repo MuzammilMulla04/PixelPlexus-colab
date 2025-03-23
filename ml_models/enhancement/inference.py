@@ -1,29 +1,44 @@
 import torch
-from diffusers import StableDiffusionPipeline
 import os
+from PIL import Image
+from diffusers import StableDiffusionUpscalePipeline
 from django.conf import settings
 
-MODEL_PATH = os.path.join(settings.BASE_DIR, "ml_models/enhancement/sd_model")
+MODEL_PATH = os.path.join(settings.BASE_DIR, "/ml_models/enhancement/sd_model")
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-pipe = StableDiffusionPipeline.from_pretrained(MODEL_PATH, torch_dtype=torch.float16 if device == "cuda" else torch.float32)
+pipe = StableDiffusionUpscalePipeline.from_pretrained(model_path, torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32)
 pipe.to(device)
 
-def enhance_image(image_path):
+def enhance_image(image_path, num_inference_steps=50, guidance_scale=7.5):
     """
-    Enhances the given image using Stable Diffusion.
+    Enhances the given image using Stable Diffusion upscaling.
+    - image_path: Path to the input image.
+    - num_inference_steps: Number of inference steps (higher = better quality, slower).
+    - guidance_scale: Strength of enhancement (default 7.5, lower = subtle, higher = aggressive).
     """
-    from PIL import Image
-    image = Image.open(image_path).convert("RGB")
+    try:
+        # Load and preprocess image
+        input_image = Image.open(image_path).convert("RGB").resize((256, 256))  # Resize for stable diffusion input
+        
+        with torch.inference_mode():
+            upscaled_image = pipe(
+                prompt="high quality, detailed, realistic",
+                image=input_image,
+                num_inference_steps=num_inference_steps,
+                guidance_scale=guidance_scale
+            ).images[0]
 
-    with torch.no_grad():
-        enhanced_image = pipe(image).images[0]
+        # Save enhanced image
+        output_dir = os.path.join(settings.MEDIA_ROOT, "enhanced_images")
+        os.makedirs(output_dir, exist_ok=True)
 
-    output_path = os.path.join(settings.MEDIA_ROOT, "enhanced_images")
-    os.makedirs(output_path, exist_ok=True)
+        enhanced_image_path = os.path.join(output_dir, os.path.basename(image_path))
+        upscaled_image.save(enhanced_image_path)
 
-    enhanced_image_path = os.path.join(output_path, os.path.basename(image_path))
-    enhanced_image.save(enhanced_image_path)
+        return os.path.join(settings.MEDIA_URL, "enhanced_images", os.path.basename(image_path))
 
-    return os.path.relpath(enhanced_image_path, settings.MEDIA_ROOT)  # Return relative path
+    except Exception as e:
+        print(f"Error during enhancement: {e}")
+        return None
