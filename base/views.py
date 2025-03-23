@@ -164,8 +164,12 @@ def imageEnhancement(request):
             messages.error(request, 'User profile does not exist!')
             return redirect('login')
 
+        prompt= request.FILES['prompt']
         # Process the image using enhancement model
-        enhanced_image_path = enhance_image(image)  # Call enhancement function
+        if not prompt:
+            enhanced_image_path = enhance_image(image)  # Call enhancement function
+        else:
+            enhanced_image_path = enhance_image(image, prompt)  # Call enhancement function with prompt
 
         # Save enhanced image in DB
         enhanced_image = EnhancedImage.objects.create(profile=profile, image=enhanced_image_path)

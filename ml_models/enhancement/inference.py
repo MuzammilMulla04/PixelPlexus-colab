@@ -8,10 +8,10 @@ MODEL_PATH = os.path.join(settings.BASE_DIR, "/ml_models/enhancement/sd_model")
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-pipe = StableDiffusionUpscalePipeline.from_pretrained(model_path, torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32)
+pipe = StableDiffusionUpscalePipeline.from_pretrained(MODEL_PATH, torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32)
 pipe.to(device)
 
-def enhance_image(image_path, num_inference_steps=50, guidance_scale=7.5):
+def enhance_image(image_path, user_prompt= None):
     """
     Enhances the given image using Stable Diffusion upscaling.
     - image_path: Path to the input image.
@@ -24,10 +24,10 @@ def enhance_image(image_path, num_inference_steps=50, guidance_scale=7.5):
         
         with torch.inference_mode():
             upscaled_image = pipe(
-                prompt="high quality, detailed, realistic",
+                prompt="high quality, detailed, realistic" if not user_prompt else user_prompt,
                 image=input_image,
-                num_inference_steps=num_inference_steps,
-                guidance_scale=guidance_scale
+                num_inference_steps=50,
+                guidance_scale=7.5
             ).images[0]
 
         # Save enhanced image
