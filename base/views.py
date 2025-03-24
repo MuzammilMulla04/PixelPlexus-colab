@@ -7,7 +7,7 @@ from .models import User, Profile, GeneratedImage, EnhancedImage, ColorizedImage
 from .forms import RegistrationForm, ProfileForm
 from ml_models.generation.inference import generate_image
 from ml_models.enhancement.inference import enhance_image
-from ml_models.colorization.inference import colorize_image
+# from ml_models.colorization.inference import colorize_image
 
 def registerUser(request):
     if request.user.is_authenticated:
@@ -159,22 +159,27 @@ def imageEnhancement(request):
             return redirect('image-enhancement')
 
         image = request.FILES['image']
+        prompt = request.POST.get('prompt', None)
+
         profile = Profile.objects.get(user=request.user)
         if not profile:
             messages.error(request, 'User profile does not exist!')
             return redirect('login')
 
-        prompt= request.FILES['prompt']
         # Process the image using enhancement model
-        if not prompt:
-            enhanced_image_path = enhance_image(image)  # Call enhancement function
-        else:
-            enhanced_image_path = enhance_image(image, prompt)  # Call enhancement function with prompt
+        enhanced_image_path = enhance_image(image, prompt)
+        if not enhanced_image_path:
+            messages.error(request, 'Image enhancement failed!')
+            return redirect('image-enhancement')
 
         # Save enhanced image in DB
         enhanced_image = EnhancedImage.objects.create(profile=profile, image=enhanced_image_path)
         messages.success(request, 'Image enhanced successfully!')
+        
         latest_image = EnhancedImage.objects.filter(profile=profile).latest('created_at')
+        if not latest_image:
+            messages.error(request, 'Something went wrong! Image not saved.')
+            return redirect('image-enhancement')
 
         return redirect('output-image', image_id=latest_image.id)
             
@@ -210,10 +215,11 @@ def imageColorization(request):
             return redirect('login')
 
         # Process the image using colorization model
-        colorized_image_path = colorize_image(image)  # Call colorization function
+        # colorized_image_path = colorize_image(image)  # Call colorization function
 
         # Save colorized image in DB
-        colorized_image = ColorizedImage.objects.create(profile=profile, image=colorized_image_path)
+        # colorized_image = ColorizedImage.objects.create(profile=profile, image=colorized_image_path)
+        colorized_image = ColorizedImage.objects.create(profile=profile, image=image)
         messages.success(request, 'Image colorized successfully!')
         latest_image = ColorizedImage.objects.filter(profile=profile).latest('created_at')
 
