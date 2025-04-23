@@ -1,60 +1,31 @@
+# File 2: django_setup.py
 import os
-import sys
-import django
 import subprocess
-from django.core.management import call_command
-from pyngrok import ngrok
 
-# Ensure the script runs from the correct directory
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-os.chdir(BASE_DIR)
+def run_command(cmd, use_shell=True):
+    print(f"💻 Running: {cmd}")
+    subprocess.run(cmd, shell=use_shell, check=True)
 
-# Set Django settings module
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "PixelPlexus.settings")  # Update with your project name
-django.setup()
-
-def run_command(cmd):
-    """Runs a shell command and handles errors."""
-    result = subprocess.run(cmd, shell=True, text=True, capture_output=True)
-    if result.returncode != 0:
-        print(f"❌ Error in command: {cmd}")
-        print(result.stderr)
-    else:
-        print(f"✅ {cmd} executed successfully.")
-
-def setup_django():
-    """Automates Django setup."""
-
-    print("🔹 Applying Migrations...")
-    call_command("makemigrations")
-    call_command("makemigrations", "base")
-    call_command("migrate")
-
-    print("🔹 Creating Superuser...")
-    from django.contrib.auth import get_user_model
-    User = get_user_model()
-    if not User.objects.filter(username="admin").exists():
-        User.objects.create_superuser("admin", "admin@gmail.com", "adminpass")
-        print("✅ Superuser created.")
-    else:
-        print("✅ Superuser already exists.")
-
-    print("🔹 Installing & Starting Tailwind...")
+def setup_django_tailwind():
+    print("🎀 Tailwind Setup Starting...")
+    run_command("python manage.py tailwind init")
+    user_input = input("🌸 Done updating settings.py manually? Press 'y' to continue: ")
+    while user_input.strip().lower() != 'y':
+        user_input = input("⚠️ Please press 'y' to continue after editing settings.py: ")
     run_command("python manage.py tailwind install")
-    run_command("python manage.py tailwind start")
+    run_command("python manage.py tailwind start &")
 
-    print("🔹 Setting up Ngrok for public access...")
-    NGROK_AUTH_TOKEN = "2uGWoKaslH2DMr0GRpkuLtXvtsP_5JGPVTYxJvuFznF25kKsS"  # Replace with your actual Ngrok token
-    run_command(f"ngrok authtoken {NGROK_AUTH_TOKEN}")
+def setup_django_db():
+    print("🛠️ Django DB Setup...")
+    run_command("python manage.py makemigrations")
+    run_command("python manage.py makemigrations base")
+    run_command("python manage.py migrate")
+    print("👤 Creating Django superuser...")
+    run_command("echo \"from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@example.com', 'adminpass') if not User.objects.filter(username='admin').exists() else print('Superuser exists')\" | python manage.py shell")
 
-    PORT = 8000
-    public_url = ngrok.connect(PORT).public_url
-    print(f"🔹 Public URL: {public_url}")
-
-    print("🔹 Running Django Server...")
-    run_command("python manage.py runserver 0.0.0.0:8000 > server_log.txt 2>&1 &")
-
-    print("✅ Django Setup Completed Successfully! 🎉")
+def main():
+    setup_django_tailwind()
+    setup_django_db()
 
 if __name__ == "__main__":
-    setup_django()
+    main()
