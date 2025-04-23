@@ -24,8 +24,10 @@ def setup_django_db():
     run_command("echo \"from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@example.com', 'adminpass') if not User.objects.filter(username='admin').exists() else print('Superuser exists')\" | python manage.py shell")
 
 def main():
+    print("🛠️ Starting Django-Tailwind Setup...")
     setup_django_tailwind()
     setup_django_db()
+    print("🎉 Django-Tailwind Setup successfully~!")
 
 if __name__ == "__main__":
     main()

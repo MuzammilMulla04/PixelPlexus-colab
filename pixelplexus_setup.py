@@ -16,16 +16,11 @@ def setup_pixelplexus():
     run_command("pip install django django-tailwind numpy pandas matplotlib django-browser-reload")
     run_command("pip install diffusers transformers accelerate torch torchvision torchaudio pyngrok")
 
-    print("🔹 Cloning GitHub repository...")
+    print("🔹 Pulling latest updates from GitHub...")
     GITHUB_USERNAME = "MuzammilMulla04"
     REPO_NAME = "PixelPlexus-colab"
     GITHUB_TOKEN = "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"
-
     REPO_PATH = f"/content/{REPO_NAME}"
-    run_command(f"git clone https://{GITHUB_USERNAME}:{GITHUB_TOKEN}@github.com/{GITHUB_USERNAME}/{REPO_NAME}.git {REPO_PATH}")
-    os.chdir(REPO_PATH)
-
-    print("🔹 Pulling latest updates from GitHub...")
     run_command("git pull")
 
     print("🔹 Setting up Stable Diffusion models...")
